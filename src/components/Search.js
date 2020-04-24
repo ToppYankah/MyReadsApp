@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { search, update, getAll } from "../BooksAPI";
-import Book from "./Book";
 import { Link } from "react-router-dom";
+import Book from "./Book";
+import SearchInput from "./SearchInput";
 
 const Search = () => {
   const [searchState, setSearchState] = useState({
@@ -10,22 +11,15 @@ const Search = () => {
     notFound: false,
   });
 
-  const handleChange = ({ currentTarget }) => {
-    const { value } = currentTarget;
-    setSearchState({...searchState, value});
-    if (value.length > 0) return handleSearch(value);
-
-    setSearchState({ ...searchState, result: [], notFound: false });
-  };
-
-  const handleSearch = async ()=>{
-    const result = await search(searchState.value);
-    if (result === undefined || !result.length) {
-      setSearchState({ ...searchState, result: [], notFound: true });
-      return;
+  const handleSearch = async (value) => {
+    if (value.length > 0) {
+      const result = await search(value);
+      if (result === undefined || !result.length)
+        return setSearchState({ value, result: [], notFound: true });
+      return updateResultStates({ value, result, notFound: result.length < 1 });
     }
-    updateResultStates({ ...searchState, result, notFound: result.length < 1 });
-  }
+    setSearchState({ value, result: [], notFound: false });
+  };
 
   const updateResultStates = async (newResult) => {
     const existingBooks = await getAll();
@@ -61,14 +55,7 @@ const Search = () => {
         <Link to="/" className="close-search">
           Close
         </Link>
-        <div className="search-books-input-wrapper">
-          <input
-            onChange={handleChange}
-            onFocus={handleChange}
-            type="text"
-            placeholder="Search by title or author"
-          />
-        </div>
+        <SearchInput onChange={handleSearch} />
       </div>
       <div className="search-books-results">
         <ol className="books-grid">

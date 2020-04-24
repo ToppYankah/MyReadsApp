@@ -7,6 +7,20 @@ import { Link } from "react-router-dom";
 class Home extends Component {
   state = {
     books: [],
+    shelves: [
+      {
+        title: "Currently Reading",
+        label: "currentlyReading",
+      },
+      {
+        title: "Want to Read",
+        label: "wantToRead",
+      },
+      {
+        title: "Read",
+        label: "read",
+      },
+    ],
   };
 
   async componentDidMount() {
@@ -24,8 +38,7 @@ class Home extends Component {
   };
 
   render() {
-    const { books } = this.state;
-
+    const { books, shelves } = this.state;
     return (
       <div className="list-books">
         <div className="list-books-title">
@@ -33,21 +46,14 @@ class Home extends Component {
         </div>
         <div className="list-books-content">
           <div>
-            <Shelf
-              onUpdate={this.handleUpdate}
-              title="Currently Reading"
-              books={books.filter((book) => book.shelf === "currentlyReading")}
-            />
-            <Shelf
-              onUpdate={this.handleUpdate}
-              title="Want to Read"
-              books={books.filter((book) => book.shelf === "wantToRead")}
-            />
-            <Shelf
-              onUpdate={this.handleUpdate}
-              title="Read"
-              books={books.filter((book) => book.shelf === "read")}
-            />
+            {shelves.map((shelf) => (
+              <Shelf
+                key={shelf.label}
+                onUpdate={this.handleUpdate}
+                title={shelf.title}
+                books={books.filter((book) => book.shelf === shelf.label)}
+              />
+            ))}
           </div>
         </div>
         <div className="open-search">
